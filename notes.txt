@@ -1,9 +1,0 @@
-- IB Gateway
-- Settings in Trader Workstation:
-  File -> Global Configuration -> API -> Settings:
-    1. Enable ActiveX and Socket Clients
-    2. Read-Only API (no order placing, only data reading)? 
-    3. Socket port: 7497 (Paper)/7496(Live)
-    4. Allow connections from localhost only
-    5. Create API message log file
-    6. logging Level: Info/Error 
