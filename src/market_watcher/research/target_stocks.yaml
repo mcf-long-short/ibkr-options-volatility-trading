@@ -1,0 +1,6 @@
+- AAPL:
+  strategy: short straddle
+- KO:
+  strategy: short straddle
+- TSLA:
+  strategy: long straddle

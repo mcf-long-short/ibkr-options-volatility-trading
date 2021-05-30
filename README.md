@@ -44,7 +44,7 @@ Requirements for enabling [Trader Workstation API](https://interactivebrokers.gi
   6. Logging Level: Error
 - Download [TWS API source code](https://interactivebrokers.github.io/#)
 
-### Setup steps
+### Python requirements
 
 Install virtual environment for python 3.x:
 
@@ -83,4 +83,11 @@ To check if `ibapi` was successfully installed run tests:
 
 ```bash
 python -m unittest discover -s src/ib_client/tests
+```
+
+### Installing MarketWatcher trading bot:
+
+```bash
+cd src
+pip install --editable .
 ```
