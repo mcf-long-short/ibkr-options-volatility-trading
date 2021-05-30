@@ -3,12 +3,13 @@ import click
 from click.utils import echo
 
 from market_watcher.version import VERSION
+from market_watcher.config import config
 
 
 @click.group()
 def cli():
     """MarketWatcher cli commands."""
-    click.echo(
+    echo(
         """
          ______              _              _  _  _                 _                 
         |  ___ \            | |         _  | || || |      _        | |                
@@ -21,13 +22,14 @@ def cli():
         for volatility trading on equity market using long and short options strategy.
     """
     )
-    click.echo(f"version: v{VERSION}")
-    click.echo("\n\n\n")
+    echo(f"version: v{VERSION}")
+    echo("\n\n\n")
 
 
 @cli.command()
 def test_send_mail():
-    pass
+    email = config["EMAIL"]
+    echo(f"Email notifications are sent to: {email}")
 
 
 @cli.command()
@@ -38,7 +40,7 @@ def test_send_mail():
 )
 def start(stocks):
     """Starts the MarketWatcher."""
-    click.echo(f"Reading terget stocks from file: {stocks}")
+    echo(f"Reading terget stocks from file: {stocks}")
 
     with open(stocks) as file:
         target_stocks = yaml.load(file, Loader=yaml.FullLoader)
@@ -49,4 +51,4 @@ def start(stocks):
 @cli.command()
 def stop():
     """Stops the MarketWatcher."""
-    click.echo(f"Stopping MarketWatcher...")
+    echo(f"Stopping MarketWatcher...")
