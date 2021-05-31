@@ -1,8 +1,16 @@
 appdirs==1.4.4
+attrs==21.2.0
 black==21.5b1
 click==8.0.1
+iniconfig==1.1.1
 mypy-extensions==0.4.3
-PyYAML==5.4.1
+packaging==20.9
 pathspec==0.8.1
+pluggy==0.13.1
+py==1.10.0
+pyparsing==2.4.7
+pytest==6.2.4
+python-dotenv==0.17.1
+PyYAML==5.4.1
 regex==2021.4.4
 toml==0.10.2
