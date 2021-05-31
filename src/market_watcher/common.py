@@ -61,7 +61,7 @@ class MarketWatcherEngine:
             strategy = self.target_stocks[ticker]["strategy"]
 
             if self.is_investment_opportunity(strategy, daily_pnls[ticker]):
-                self.send_email(ticker, strategy, daily_pnl)
+                self.send_email(ticker, strategy, daily_pnls[ticker])
 
     def get_email_recipient(self):
         """Returns email address to which to send emails to."""
