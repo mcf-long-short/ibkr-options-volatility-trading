@@ -2,6 +2,7 @@ import time
 from enum import Enum
 
 import yaml
+from yahoofinancials import YahooFinancials
 
 from market_watcher.config import context
 
@@ -54,12 +55,12 @@ class MarketWatcherEngine:
         noticication stating which options trading strategy trader should
         implement.
         """
+        daily_pnls = self.get_daily_pnls()
+        
         for ticker in self.target_stocks:
             strategy = self.target_stocks[ticker]["strategy"]
-            daily_pnl = self.get_daily_pnl(ticker)
-            # print(ticker, strategy)
 
-            if self.is_investment_opportunity(strategy, daily_pnl):
+            if self.is_investment_opportunity(strategy, daily_pnls[ticker]):
                 self.send_email(ticker, strategy, daily_pnl)
 
     def get_email_recipient(self):
@@ -77,10 +78,11 @@ class MarketWatcherEngine:
 
         # TODO: implement logic for sending email (put email config to .env.secret)
 
-    def get_daily_pnl(self, ticker):
-        """Returns daily pnl"""
-        # TODO: Implement logic for fetching daily pnl for stock
-        pass
+    def get_daily_pnls(self):
+        """Returns daily pnls"""
+        target_stocks = list(self.target_stocks.keys())
+        yahoo_financials_target_stocks = YahooFinancials(target_stocks)
+        return yahoo_financials_target_stocks.get_current_percent_change()
 
     def is_investment_opportunity(self, strategy, daily_pnl):
         """Check if the stock is applicable for one of the options trading strategies."""

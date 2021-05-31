@@ -14,3 +14,4 @@ python-dotenv==0.17.1
 PyYAML==5.4.1
 regex==2021.4.4
 toml==0.10.2
+yahoofinancials==1.6
