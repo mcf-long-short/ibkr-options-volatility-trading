@@ -1,3 +1,103 @@
+ABEO:
+  strategy: long straddle
+ACRX:
+  strategy: long straddle
+ADVM:
+  strategy: long straddle
+AMC:
+  strategy: long straddle
+AVRO:
+  strategy: long straddle
+BDTX:
+  strategy: long straddle
+BTU:
+  strategy: long straddle
+CCXI:
+  strategy: long straddle
+CRTX:
+  strategy: long straddle
+CVM:
+  strategy: long straddle
+DDD:
+  strategy: long straddle
+DKS:
+  strategy: long straddle
+DY:
+  strategy: long straddle
+ESGC:
+  strategy: long straddle
+ETNB:
+  strategy: long straddle
+ETON:
+  strategy: long straddle
+EVFM:
+  strategy: long straddle
+EXPR:
+  strategy: long straddle
+FOSL:
+  strategy: long straddle
+GME:
+  strategy: long straddle
+INBX:
+  strategy: long straddle
+JYNT:
+  strategy: long straddle
+KERN:
+  strategy: long straddle
+LCI:
+  strategy: long straddle
+LJPC:
+  strategy: long straddle
+LNTH:
+  strategy: long straddle
+MESA:
+  strategy: long straddle
+MMAC:
+  strategy: long straddle
+NGM:
+  strategy: long straddle
+NMRD:
+  strategy: long straddle
+NNBR:
+  strategy: long straddle
+NYMX:
+  strategy: long straddle
+OMI:
+  strategy: long straddle
+PDLB:
+  strategy: long straddle
+PRVB:
+  strategy: long straddle
+REX:
+  strategy: long straddle
+SKY:
+  strategy: long straddle
+SLCA:
+  strategy: long straddle
+SRGA:
+  strategy: long straddle
+SYRS:
+  strategy: long straddle
+TELL:
+  strategy: long straddle
+TITN:
+  strategy: long straddle
+UEC:
+  strategy: long straddle
+WBT:
+  strategy: long straddle
+WKHS:
+  strategy: long straddle
+WLLAW:
+  strategy: long straddle
+WLLBW:
+  strategy: long straddle
+WRAP:
+  strategy: long straddle
+YEXT:
+  strategy: long straddle
+PIRS:
+  strategy: long straddle
 ADM:
   strategy: short straddle
 AEP:
@@ -98,3 +198,4 @@ YUM:
   strategy: short straddle
 GFN:
   strategy: short straddle
+
