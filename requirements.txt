@@ -13,4 +13,5 @@ pytest==6.2.4
 python-dotenv==0.17.1
 PyYAML==5.4.1
 regex==2021.4.4
+slack-sdk==3.5.1
 toml==0.10.2
