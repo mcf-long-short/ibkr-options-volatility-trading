@@ -4,3 +4,9 @@ KO:
   strategy: short straddle
 TSLA:
   strategy: long straddle
+WBT:
+  strategy: long straddle
+PIRS:
+  strategy: long straddle
+YUM:
+  strategy: short straddle

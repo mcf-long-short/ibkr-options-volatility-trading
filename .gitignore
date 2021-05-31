@@ -18,8 +18,8 @@ log.*
 .vscode
 *.pyproj
 
-# Secrets
-.env.secret
+# Environment variables file
+.env
 
 # PyCharm files
 .idea
