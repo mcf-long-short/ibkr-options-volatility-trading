@@ -27,24 +27,71 @@ We first begin with doing basic market research and finding historically the mos
 
 Stop loss/ Bracket order
 
-## IBKR: Implementing market data scanner trading bot
+## How to use MarketWatcher trading bot?
 
-### IBKR requirements
+Based on cofigured environment variables in .env file (`email notification interval time` and `daily P&L threashold values` for both strategies) and provided .yaml file with `target stocks (ticker and long/short straddle strategy indicator for that ticker)`, MarketWatcher engine listens to real-time ticker data feed and notifies us when there is a `potential opportunity for entering into long or short straddle options position`, with that stock as an underlying.
 
-Requirements for enabling [Trader Workstation API](https://interactivebrokers.github.io/tws-api/):
+You can control MarketWatcher trading bot using simple command-line-tool we built. And after bot is started it will send us an email for each investment opportunity it finds for our target stocks.
 
-- Download and install [Trader Workstation](https://www.interactivebrokers.com/en/index.php?f=14099#tws-software)
-- Download and install [IB Gateway](https://www.interactivebrokers.com/en/index.php?f=16457)
-- Enable following setting in the TWS (`File -> Global Configuration -> API -> Settings`):
-  1. Enable ActiveX and Socket Clients
-  2. Read-Only API (no order placing, only data reading for our scraping bot)
-  3. Socket port: 7497 (Paper)/7496(Live)
-  4. Allow connections from localhost only
-  5. Create API message log file
-  6. Logging Level: Error
-- Download [TWS API source code](https://interactivebrokers.github.io/#)
+CLI commands:
 
-### Python requirements
+```bash
+market_watcher_cli start
+market_watcher_cli stop
+market_watcher_cli email-config
+```
+
+Example ClI output upon starting MarketWatcher engine:
+
+```
+         ______              _              _  _  _                 _
+        |  ___ \            | |         _  | || || |      _        | |
+        | | _ | | ____  ____| |  _ ____| |_| || || | ____| |_  ____| | _   ____  ____
+        | || || |/ _  |/ ___) | / ) _  )  _) ||_|| |/ _  |  _)/ ___) || \ / _  )/ ___)
+        | || || ( ( | | |   | |< ( (/ /| |_| |___| ( ( | | |_( (___| | | ( (/ /| |
+        |_||_||_|\_||_|_|   |_| \_)____)\___)______|\_||_|\___)____)_| |_|\____)_|
+
+        MarketWatcher tool for finding investiments opportunities on Interacive Brokers
+        for volatility trading on equity market using long and short options strategy.
+
+        version: v0.1.0
+
+
+
+
+        Starting MarketWatcher...
+        MarketWatcher started.
+```
+
+You can run cli tool from:
+
+- Docker container (using docker-compose)
+- Python virtual environment
+
+### 1. Running in Docker
+
+Building docker image:
+
+```bash
+docker build -t my_image --rm .
+```
+
+Running docker-compose:
+
+```bash
+docker-compose run --rm app
+```
+
+After docker-compose command you can run any on the cli commands:
+
+```bash
+market_watcher_cli --help
+market_watcher_cli start
+market_watcher_cli stop
+market_watcher_cli email-config
+```
+
+### 2. Running in virtual environment
 
 Install virtual environment for python 3.x:
 
@@ -75,7 +122,8 @@ pip install -r requirements.txt
 Install `ibapi` client (so you can use `import ibapi` in the code for this python venv):
 
 ```bash
-python src/ib_client setup.py bdist_wheel
+cd src/market_watcher/ib_client
+python setup.py bdist_wheel
 pip install src/ib_client/dist/ibapi-9.76.1-py3-none-any.whl
 ```
 
@@ -91,3 +139,20 @@ python -m unittest discover -s src/ib_client/tests
 cd src
 pip install --editable .
 ```
+
+## IBKR: Implementing market data scanner trading bot
+
+### IBKR requirements
+
+Requirements for enabling [Trader Workstation API](https://interactivebrokers.github.io/tws-api/):
+
+- Download and install [Trader Workstation](https://www.interactivebrokers.com/en/index.php?f=14099#tws-software)
+- Download and install [IB Gateway](https://www.interactivebrokers.com/en/index.php?f=16457)
+- Enable following setting in the TWS (`File -> Global Configuration -> API -> Settings`):
+  1. Enable ActiveX and Socket Clients
+  2. Read-Only API (no order placing, only data reading for our scraping bot)
+  3. Socket port: 7497 (Paper)/7496(Live)
+  4. Allow connections from localhost only
+  5. Create API message log file
+  6. Logging Level: Error
+- Download [TWS API source code](https://interactivebrokers.github.io/#)
