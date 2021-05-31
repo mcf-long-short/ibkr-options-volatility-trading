@@ -27,7 +27,7 @@ class MarketWatcherEngine:
 
     def __init__(self, target_stocks=None):
         self.target_stocks = target_stocks
-        self.email_recipient = context.config["EMAIL"]
+        #self.email_recipient = context.config["EMAIL"]
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
 
@@ -73,9 +73,9 @@ class MarketWatcherEngine:
 
     def send_email(self, ticker, strategy, daily_pnl):
         """Send an email notification about potetntial investment opportunity."""
-        recipient = self.get_email_recipient()
-        title = self.format_email_title(self, ticker, strategy, daily_pnl)
-
+        #recipient = self.get_email_recipient()
+        title = self.format_email_title(ticker, strategy, daily_pnl)
+        print (title)
         # TODO: implement logic for sending email (put email config to .env.secret)
 
     def get_daily_pnls(self):
@@ -87,10 +87,10 @@ class MarketWatcherEngine:
     def is_investment_opportunity(self, strategy, daily_pnl):
         """Check if the stock is applicable for one of the options trading strategies."""
         if STRATEGIES.LONG_STRADDLE.value == strategy:
-            if daily_pnl > self.long_threshlold:
+            if abs(daily_pnl) > self.long_threshlold:
                 return True
         elif STRATEGIES.SHORT_STRADDLE.value == strategy:
-            if daily_pnl < self.short_threshlold:
+            if abs(daily_pnl) < self.short_threshlold:
                 return True
 
         return False
