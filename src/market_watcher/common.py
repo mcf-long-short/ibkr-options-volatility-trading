@@ -57,11 +57,12 @@ class MarketWatcherEngine:
         """
         daily_pnls = self.get_daily_pnls()
         
+        investment_opportunities = []
         for ticker in self.target_stocks:
-            strategy = self.target_stocks[ticker]["strategy"]
-
-            if self.is_investment_opportunity(strategy, daily_pnls[ticker]):
-                self.send_email(ticker, strategy, daily_pnls[ticker])
+            if self.is_investment_opportunity(self.target_stocks[ticker]["strategy"], daily_pnls[ticker]):
+                investment_opportunities.append(ticker)
+        
+        self.send_email(investment_opportunities, daily_pnls)
 
     def get_email_recipient(self):
         """Returns email address to which to send emails to."""
@@ -71,11 +72,24 @@ class MarketWatcherEngine:
         """Returns formatted email title."""
         return f"{ticker} {daily_pnl}% {strategy}"
 
-    def send_email(self, ticker, strategy, daily_pnl):
-        """Send an email notification about potetntial investment opportunity."""
-        #recipient = self.get_email_recipient()
-        title = self.format_email_title(ticker, strategy, daily_pnl)
-        print (title)
+    def send_email(self, tickers, daily_pnls):
+        """Send an email notification about potetntial investment opportunities."""
+        long_straddle_opportunities, short_straddle_opportunities = [], []
+        for ticker in tickers:
+            if STRATEGIES.LONG_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                long_straddle_opportunities.append([ticker, daily_pnls[ticker]])
+            elif STRATEGIES.SHORT_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                short_straddle_opportunities.append([ticker, daily_pnls[ticker]])
+         
+        # CHANGE: Currently printing the investment opportunities. Email should be sent instead.
+        print ("Long straddle opportunities:")
+        for asset in long_straddle_opportunities:
+            print (f"{asset[0]}: {asset[1]}")
+            
+        print ("Short straddle opportunities:")
+        for asset in short_straddle_opportunities:
+            print (f"{asset[0]}: {asset[1]}")
+            
         # TODO: implement logic for sending email (put email config to .env.secret)
 
     def get_daily_pnls(self):

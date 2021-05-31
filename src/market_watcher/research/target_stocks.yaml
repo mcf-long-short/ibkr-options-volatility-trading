@@ -1,6 +1,100 @@
-AAPL:
+ADM:
+  strategy: short straddle
+AEP:
+  strategy: short straddle
+AGNC:
+  strategy: short straddle
+AJRD:
+  strategy: short straddle
+ALSK:
+  strategy: short straddle
+ANTM:
+  strategy: short straddle
+APH:
+  strategy: short straddle
+ATO:
+  strategy: short straddle
+BPYU:
+  strategy: short straddle
+BR:
+  strategy: short straddle
+CAG:
+  strategy: short straddle
+CATM:
+  strategy: short straddle
+CBB:
+  strategy: short straddle
+CI:
+  strategy: short straddle
+CL:
+  strategy: short straddle
+CLGX:
+  strategy: short straddle
+CNBKA:
+  strategy: short straddle
+FFG:
+  strategy: short straddle
+FRTA:
+  strategy: short straddle
+GGG:
+  strategy: short straddle
+GRA:
+  strategy: short straddle
+HSY:
+  strategy: short straddle
+IBM:
+  strategy: short straddle
+JNJ:
   strategy: short straddle
 KO:
   strategy: short straddle
-TSLA:
-  strategy: long straddle
+LDOS:
+  strategy: short straddle
+LMNX:
+  strategy: short straddle
+LTC:
+  strategy: short straddle
+MDLZ:
+  strategy: short straddle
+MGLN:
+  strategy: short straddle
+MMC:
+  strategy: short straddle
+MMS:
+  strategy: short straddle
+NAV:
+  strategy: short straddle
+NUAN:
+  strategy: short straddle
+ORBC:
+  strategy: short straddle
+PM:
+  strategy: short straddle
+PNM:
+  strategy: short straddle
+PROS:
+  strategy: short straddle
+PTVCB:
+  strategy: short straddle
+SO:
+  strategy: short straddle
+SPWH:
+  strategy: short straddle
+STAY:
+  strategy: short straddle
+STND:
+  strategy: short straddle
+TPCO:
+  strategy: short straddle
+TTMI:
+  strategy: short straddle
+UNH:
+  strategy: short straddle
+WIFI:
+  strategy: short straddle
+WTRE:
+  strategy: short straddle
+YUM:
+  strategy: short straddle
+GFN:
+  strategy: short straddle
