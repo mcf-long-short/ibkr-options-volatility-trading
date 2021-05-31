@@ -1,12 +1,22 @@
+# Virtual environment
 .venv
+
+# Python files
 .pyc
 __pycache__
 __pycache__/*
-log/*
-*.log
-log.*
 *.egg-info
 build
 dist
+
+# Log files
+log/*
+*.log
+log.*
+
+# IDEs
 .vscode
 *.pyproj
+
+# Secrets
+.env.secret
