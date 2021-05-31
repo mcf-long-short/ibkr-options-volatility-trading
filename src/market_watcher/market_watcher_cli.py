@@ -1,9 +1,10 @@
-import yaml
 import click
 from click.utils import echo
 
 from market_watcher.version import VERSION
-from market_watcher.config import config
+from market_watcher.config import context
+from market_watcher.common import get_terget_stocks
+from market_watcher.common import MarketWatcherEngine
 
 
 @click.group()
@@ -27,9 +28,17 @@ def cli():
 
 
 @cli.command()
-def test_send_mail():
-    email = config["EMAIL"]
+def email_config():
+    """Lists email recipient and email title format."""
+    market_watcher_engine = MarketWatcherEngine()
+
+    email = market_watcher_engine.get_email_recipient()
+    title = market_watcher_engine.format_email_title(
+        ticker="MSFT", strategy="Long Straddle", daily_pnl="-5.2"
+    )
+
     echo(f"Email notifications are sent to: {email}")
+    echo(f"Email Title format: {title}")
 
 
 @cli.command()
@@ -40,15 +49,28 @@ def test_send_mail():
 )
 def start(stocks):
     """Starts the MarketWatcher."""
-    echo(f"Reading terget stocks from file: {stocks}")
+    echo(f"Starting MarketWatcher...")
 
-    with open(stocks) as file:
-        target_stocks = yaml.load(file, Loader=yaml.FullLoader)
+    try:
+        context.running = True
+        echo(f"MarketWatcher started.")
 
-        print(target_stocks)
+        echo(f"Reading terget stocks from file: {stocks}")
+        target_stocks = get_terget_stocks(stocks)
+
+        market_watcher_engine = MarketWatcherEngine(target_stocks=target_stocks)
+        market_watcher_engine.search_for_intestment_opportunities()
+    except ValueError as e:
+        echo(e)
 
 
 @cli.command()
 def stop():
     """Stops the MarketWatcher."""
     echo(f"Stopping MarketWatcher...")
+
+    try:
+        context.running = False
+        echo(f"MarketWatcher stopped.")
+    except ValueError as e:
+        echo(e)
