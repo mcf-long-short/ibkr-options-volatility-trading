@@ -51,7 +51,7 @@ class MarketWatcherEngine:
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
 
-        self.daily_pnls = self.get_daily_pnls()
+        self.daily_pnls = None
 
     def search_for_intestment_opportunities(self):
         # Update interval for sending email notifications
@@ -77,6 +77,7 @@ class MarketWatcherEngine:
         noticication stating which options trading strategy trader should
         implement.
         """
+        self.daily_pnls = self.get_daily_pnls()
         investment_opportunities = []
         for ticker in self.target_stocks:
             if self.is_investment_opportunity(
