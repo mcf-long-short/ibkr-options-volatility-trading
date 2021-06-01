@@ -8,6 +8,7 @@ from market_watcher.common import get_email_config, get_slack_config
 from market_watcher.common import MarketWatcherEngine
 from market_watcher.notifier import EmailNotifier, SlackNotifier
 
+
 @click.group()
 def cli():
     """MarketWatcher cli commands."""
@@ -32,24 +33,40 @@ def cli():
 def test_slack():
     """Sends dummy messages to test if Slack app has been configured properly."""
 
-    config = get_slack_config()
-    slack_notifier = SlackNotifier(config)
-    slack_notifier.send(config['long url'],"MarketWatcher: Test long channel!")
-    slack_notifier.send(config['short url'],"MarketWatcher: Test short channel!")
+    try:
+        echo("Testing Slack options-trading bot...")
+
+        config = get_slack_config()
+        slack_notifier = SlackNotifier(config)
+
+        echo("Sending message to #options-long-straddle channel...")
+        slack_notifier.send_message(config["long url"], "MarketWatcher: Test long!")
+
+        echo("Sending message to #options-short-straddle channel...")
+        slack_notifier.send_message(config["short url"], "MarketWatcher: Test short!")
+    except Exception as e:
+        echo("Slack testing failed!")
+        echo(e)
 
 
 @cli.command()
-def email_config():
-    """Lists email recipient and email title format."""
-    market_watcher_engine = MarketWatcherEngine()
+@click.option(
+    "--notifier",
+    default="all",
+    help="Available options: email, slack, all",
+)
+def config(notifier):
+    """Lists congiguration for slack and email notifiers."""
 
-    email = market_watcher_engine.get_email_recipient()
-    title = market_watcher_engine.format_email_title(
-        ticker="MSFT", strategy="Long Straddle", daily_pnl="-5.2"
-    )
+    if notifier == "all" or notifier == "slack":
+        config = get_slack_config()
+        for env in config:
+            echo(f"{env}: {config[env]}")
 
-    echo(f"Email notifications are sent to: {email}")
-    echo(f"Email Title format: {title}")
+    if notifier == "all" or notifier == "email":
+        config = get_email_config()
+        for env in config:
+            echo(f"{env}: {config[env]}")
 
 
 @cli.command()
@@ -69,11 +86,20 @@ def start(stocks):
         echo(f"Reading target stocks from file: {stocks}")
         target_stocks = get_terget_stocks(stocks)
 
-        echo("Instantiating email notifier.")
-        notifier = EmailNotifier(get_email_config())
+        notifiers = []
+
+        if context.state["email"]:
+            echo("Instantiating email notifier.")
+            notifiers.append(EmailNotifier(get_email_config()))
+
+        if context.state["slack"]:
+            echo("Instantiating slack notifier.")
+            notifiers.append(SlackNotifier(get_slack_config()))
 
         echo("Instantiating MarketWatcher and running the engine.")
-        market_watcher_engine = MarketWatcherEngine(target_stocks=target_stocks, notifier=notifier)
+        market_watcher_engine = MarketWatcherEngine(
+            target_stocks=target_stocks, notifiers=notifiers
+        )
         market_watcher_engine.search_for_intestment_opportunities()
     except ValueError as e:
         echo(e)
