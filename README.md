@@ -73,13 +73,13 @@ You can run cli tool from:
 Building docker image:
 
 ```bash
-docker build -t my_image --rm .
+docker build -t ibkr --rm .
 ```
 
 Running docker-compose:
 
 ```bash
-docker-compose run --rm app
+docker-compose run --rm ibkr
 ```
 
 After docker-compose command you can run any on the cli commands:

@@ -2,6 +2,7 @@ import time
 from enum import Enum
 
 import yaml
+from slack_sdk.webhook import WebhookClient
 
 from market_watcher.config import context
 
@@ -26,9 +27,13 @@ class MarketWatcherEngine:
 
     def __init__(self, target_stocks=None):
         self.target_stocks = target_stocks
+
+        # Load config from env variables
         self.email_recipient = context.config["EMAIL"]
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
+        self.long_url = context.config["SLACK_LONG_WEBHOOK"]
+        self.short_url = context.config["SLACK_SHORT_WEBHOOK"]
 
     def search_for_intestment_opportunities(self):
         # Update interval for sending email notifications
@@ -76,6 +81,14 @@ class MarketWatcherEngine:
         title = self.format_email_title(self, ticker, strategy, daily_pnl)
 
         # TODO: implement logic for sending email (put email config to .env.secret)
+
+    def send_slack_message(self, url, text):
+        """Sends message to Slack channel using webhook."""
+
+        webhook = WebhookClient(url)
+        response = webhook.send(text=text)
+        assert response.status_code == 200
+        assert response.body == "ok"
 
     def get_daily_pnl(self, ticker):
         """Returns daily pnl"""

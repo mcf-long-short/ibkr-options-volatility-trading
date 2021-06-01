@@ -28,6 +28,15 @@ def cli():
 
 
 @cli.command()
+def test_slack():
+    """Sends dummy messages to test if Slack app has been configured properly."""
+
+    engine = MarketWatcherEngine()
+    engine.send_slack_message(engine.long_url, "MarketWatcher: Test long channel!")
+    engine.send_slack_message(engine.short_url, "MarketWatcher: Test short channel!")
+
+
+@cli.command()
 def email_config():
     """Lists email recipient and email title format."""
     market_watcher_engine = MarketWatcherEngine()
