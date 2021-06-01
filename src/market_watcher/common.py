@@ -7,6 +7,7 @@ from yahoofinancials import YahooFinancials
 
 from market_watcher.config import context
 
+
 class STRATEGIES(Enum):
     LONG_STRADDLE = "long straddle"
     SHORT_STRADDLE = "short straddle"
@@ -21,29 +22,31 @@ def get_terget_stocks(file_path):
     except Exception as e:
         print(e)
 
+
 def get_email_config():
     email_config = {}
-    email_config['hostname'] = context.config["SMTP_HOSTNAME"]
-    email_config['port'] = context.config["SMTP_PORT"]
-    email_config['username'] = context.config["SMTP_USERNAME"]
-    email_config['password'] = context.config["SMTP_PASSWORD"]
-    email_config['sender'] = context.config["EMAIL_SENDER"]
-    email_config['recipients'] = context.config["EMAIL_RECIPIENTS"]
+    email_config["hostname"] = context.config["SMTP_HOSTNAME"]
+    email_config["port"] = context.config["SMTP_PORT"]
+    email_config["username"] = context.config["SMTP_USERNAME"]
+    email_config["password"] = context.config["SMTP_PASSWORD"]
+    email_config["sender"] = context.config["EMAIL_SENDER"]
+    email_config["recipients"] = context.config["EMAIL_RECIPIENTS"]
     return email_config
+
 
 def get_slack_config():
     slack_config = {}
-    slack_config['long url'] = context.config["SLACK_LONG_WEBHOOK"]
-    slack_config['short url'] = context.config["SLACK_SHORT_WEBHOOK"]
+    slack_config["long url"] = context.config["SLACK_LONG_WEBHOOK"]
+    slack_config["short url"] = context.config["SLACK_SHORT_WEBHOOK"]
     return slack_config
 
 
 class MarketWatcherEngine:
     """MarketWatcher core engine logic for scarping financial data."""
 
-    def __init__(self, target_stocks=None, notifier=None):
+    def __init__(self, target_stocks=None, notifiers=None):
         self.target_stocks = target_stocks
-        self.notifier = notifier
+        self.notifiers = notifiers
 
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
@@ -76,12 +79,19 @@ class MarketWatcherEngine:
         """
         investment_opportunities = []
         for ticker in self.target_stocks:
-            if self.is_investment_opportunity(self.target_stocks[ticker]["strategy"], abs(self.daily_pnls[ticker])):
+            if self.is_investment_opportunity(
+                self.target_stocks[ticker]["strategy"], abs(self.daily_pnls[ticker])
+            ):
                 investment_opportunities.append(ticker)
 
         investment_data = self.get_investment_data(investment_opportunities)
 
-        self.notifier.notify(investment_data)
+        self.notify(investment_data)
+
+    def notify(self, investment_data):
+        """Sends investment updates to subscribed notifiers."""
+        for notifier in self.notifiers:
+            notifier.notify(investment_data)
 
     def get_daily_pnls(self):
         """Returns daily pnls"""
@@ -97,10 +107,16 @@ class MarketWatcherEngine:
         for ticker in investment_opportunities:
             if STRATEGIES.LONG_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
                 long_straddle[ticker] = self.daily_pnls[ticker]
-            elif STRATEGIES.SHORT_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+            elif (
+                STRATEGIES.SHORT_STRADDLE.value
+                == self.target_stocks[ticker]["strategy"]
+            ):
                 short_straddle[ticker] = self.daily_pnls[ticker]
 
-        return {STRATEGIES.LONG_STRADDLE.value: long_straddle, STRATEGIES.SHORT_STRADDLE.value: short_straddle}
+        return {
+            STRATEGIES.LONG_STRADDLE.value: long_straddle,
+            STRATEGIES.SHORT_STRADDLE.value: short_straddle,
+        }
 
     def is_investment_opportunity(self, strategy, abs_daily_pnl):
         """Check if the stock is applicable for one of the options trading strategies."""
