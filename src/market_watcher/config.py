@@ -49,8 +49,7 @@ class Context:
 
 # Environment variable settings from .env files
 config = {
-    **dotenv_values(".env.settings"),  # load shared development variables
-    **dotenv_values(".env.secret"),  # load sensitive variables
+    **dotenv_values(".env"),  # load shared development variables
     **os.environ,  # override loaded values with environment variables
 }
 

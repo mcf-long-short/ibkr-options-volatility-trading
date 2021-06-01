@@ -2,10 +2,10 @@ import time
 from enum import Enum
 
 import yaml
-from slack_sdk.webhook import WebhookClient
+
+from yahoofinancials import YahooFinancials
 
 from market_watcher.config import context
-
 
 class STRATEGIES(Enum):
     LONG_STRADDLE = "long straddle"
@@ -21,19 +21,34 @@ def get_terget_stocks(file_path):
     except Exception as e:
         print(e)
 
+def get_email_config():
+    email_config = {}
+    email_config['hostname'] = context.config["SMTP_HOSTNAME"]
+    email_config['port'] = context.config["SMTP_PORT"]
+    email_config['username'] = context.config["SMTP_USERNAME"]
+    email_config['password'] = context.config["SMTP_PASSWORD"]
+    email_config['sender'] = context.config["EMAIL_SENDER"]
+    email_config['recipients'] = context.config["EMAIL_RECIPIENTS"]
+    return email_config
+
+def get_slack_config():
+    slack_config = {}
+    slack_config['long url'] = context.config["SLACK_LONG_WEBHOOK"]
+    slack_config['short url'] = context.config["SLACK_SHORT_WEBHOOK"]
+    return slack_config
+
 
 class MarketWatcherEngine:
     """MarketWatcher core engine logic for scarping financial data."""
 
-    def __init__(self, target_stocks=None):
+    def __init__(self, target_stocks=None, notifier=None):
         self.target_stocks = target_stocks
+        self.notifier = notifier
 
-        # Load config from env variables
-        self.email_recipient = context.config["EMAIL"]
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
-        self.long_url = context.config["SLACK_LONG_WEBHOOK"]
-        self.short_url = context.config["SLACK_SHORT_WEBHOOK"]
+
+        self.daily_pnls = self.get_daily_pnls()
 
     def search_for_intestment_opportunities(self):
         # Update interval for sending email notifications
@@ -59,49 +74,41 @@ class MarketWatcherEngine:
         noticication stating which options trading strategy trader should
         implement.
         """
+        investment_opportunities = []
         for ticker in self.target_stocks:
-            strategy = self.target_stocks[ticker]["strategy"]
-            daily_pnl = self.get_daily_pnl(ticker)
-            # print(ticker, strategy)
+            if self.is_investment_opportunity(self.target_stocks[ticker]["strategy"], abs(self.daily_pnls[ticker])):
+                investment_opportunities.append(ticker)
 
-            if self.is_investment_opportunity(strategy, daily_pnl):
-                self.send_email(ticker, strategy, daily_pnl)
+        investment_data = self.get_investment_data(investment_opportunities)
 
-    def get_email_recipient(self):
-        """Returns email address to which to send emails to."""
-        return self.email_recipient
+        self.notifier.notify(investment_data)
 
-    def format_email_title(self, ticker, strategy, daily_pnl):
-        """Returns formatted email title."""
-        return f"{ticker} {daily_pnl}% {strategy}"
+    def get_daily_pnls(self):
+        """Returns daily pnls"""
+        target_stocks = list(self.target_stocks.keys())
+        yahoo_financials_target_stocks = YahooFinancials(target_stocks)
+        return yahoo_financials_target_stocks.get_current_percent_change()
 
-    def send_email(self, ticker, strategy, daily_pnl):
-        """Send an email notification about potetntial investment opportunity."""
-        recipient = self.get_email_recipient()
-        title = self.format_email_title(self, ticker, strategy, daily_pnl)
+    def get_investment_data(self, investment_opportunities):
+        """Returns two dictionaries that contain investment data for both strategies"""
+        long_straddle = {}
+        short_straddle = {}
 
-        # TODO: implement logic for sending email (put email config to .env.secret)
+        for ticker in investment_opportunities:
+            if STRATEGIES.LONG_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                long_straddle[ticker] = self.daily_pnls[ticker]
+            elif STRATEGIES.SHORT_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                short_straddle[ticker] = self.daily_pnls[ticker]
 
-    def send_slack_message(self, url, text):
-        """Sends message to Slack channel using webhook."""
+        return {STRATEGIES.LONG_STRADDLE.value: long_straddle, STRATEGIES.SHORT_STRADDLE.value: short_straddle}
 
-        webhook = WebhookClient(url)
-        response = webhook.send(text=text)
-        assert response.status_code == 200
-        assert response.body == "ok"
-
-    def get_daily_pnl(self, ticker):
-        """Returns daily pnl"""
-        # TODO: Implement logic for fetching daily pnl for stock
-        pass
-
-    def is_investment_opportunity(self, strategy, daily_pnl):
+    def is_investment_opportunity(self, strategy, abs_daily_pnl):
         """Check if the stock is applicable for one of the options trading strategies."""
         if STRATEGIES.LONG_STRADDLE.value == strategy:
-            if daily_pnl > self.long_threshlold:
+            if abs_daily_pnl > self.long_threshlold:
                 return True
         elif STRATEGIES.SHORT_STRADDLE.value == strategy:
-            if daily_pnl < self.short_threshlold:
+            if abs_daily_pnl < self.short_threshlold:
                 return True
 
         return False
