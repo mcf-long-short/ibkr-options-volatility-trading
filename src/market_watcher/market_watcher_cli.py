@@ -4,8 +4,9 @@ from click.utils import echo
 from market_watcher.version import VERSION
 from market_watcher.config import context
 from market_watcher.common import get_terget_stocks
+from market_watcher.common import get_email_config
 from market_watcher.common import MarketWatcherEngine
-
+from market_watcher.notifier import EmailNotifier
 
 @click.group()
 def cli():
@@ -55,10 +56,14 @@ def start(stocks):
         context.running = True
         echo(f"MarketWatcher started.")
 
-        echo(f"Reading terget stocks from file: {stocks}")
+        echo(f"Reading target stocks from file: {stocks}")
         target_stocks = get_terget_stocks(stocks)
 
-        market_watcher_engine = MarketWatcherEngine(target_stocks=target_stocks)
+        echo("Instantiating email notifier.")
+        notifier = EmailNotifier(get_email_config())
+
+        echo("Instantiating MarketWatcher and running the engine.")
+        market_watcher_engine = MarketWatcherEngine(target_stocks=target_stocks, notifier=notifier)
         market_watcher_engine.search_for_intestment_opportunities()
     except ValueError as e:
         echo(e)

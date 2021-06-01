@@ -6,7 +6,6 @@ from yahoofinancials import YahooFinancials
 
 from market_watcher.config import context
 
-
 class STRATEGIES(Enum):
     LONG_STRADDLE = "long straddle"
     SHORT_STRADDLE = "short straddle"
@@ -21,15 +20,28 @@ def get_terget_stocks(file_path):
     except Exception as e:
         print(e)
 
+def get_email_config():
+    email_config = {}
+    email_config['hostname'] = context.config["SMTP_HOSTNAME"]
+    email_config['port'] = context.config["SMTP_PORT"]
+    email_config['username'] = context.config["SMTP_USERNAME"]
+    email_config['password'] = context.config["SMTP_PASSWORD"]
+    email_config['sender'] = context.config["EMAIL_SENDER"]
+    email_config['recipients'] = context.config["EMAIL_RECIPIENTS"]
+    return email_config
+
 
 class MarketWatcherEngine:
     """MarketWatcher core engine logic for scarping financial data."""
 
-    def __init__(self, target_stocks=None):
+    def __init__(self, target_stocks=None, notifier=None):
         self.target_stocks = target_stocks
-        #self.email_recipient = context.config["EMAIL"]
+        self.notifier = notifier
+
         self.long_threshlold = float(context.config["LONG_THRESHOLD"])
         self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
+
+        self.daily_pnls = self.get_daily_pnls()
 
     def search_for_intestment_opportunities(self):
         # Update interval for sending email notifications
@@ -55,42 +67,14 @@ class MarketWatcherEngine:
         noticication stating which options trading strategy trader should
         implement.
         """
-        daily_pnls = self.get_daily_pnls()
-        
         investment_opportunities = []
         for ticker in self.target_stocks:
-            if self.is_investment_opportunity(self.target_stocks[ticker]["strategy"], daily_pnls[ticker]):
+            if self.is_investment_opportunity(self.target_stocks[ticker]["strategy"], abs(self.daily_pnls[ticker])):
                 investment_opportunities.append(ticker)
-        
-        self.send_email(investment_opportunities, daily_pnls)
 
-    def get_email_recipient(self):
-        """Returns email address to which to send emails to."""
-        return self.email_recipient
+        investment_data = self.get_investment_data(investment_opportunities)
 
-    def format_email_title(self, ticker, strategy, daily_pnl):
-        """Returns formatted email title."""
-        return f"{ticker} {daily_pnl}% {strategy}"
-
-    def send_email(self, tickers, daily_pnls):
-        """Send an email notification about potetntial investment opportunities."""
-        long_straddle_opportunities, short_straddle_opportunities = [], []
-        for ticker in tickers:
-            if STRATEGIES.LONG_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
-                long_straddle_opportunities.append([ticker, daily_pnls[ticker]])
-            elif STRATEGIES.SHORT_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
-                short_straddle_opportunities.append([ticker, daily_pnls[ticker]])
-         
-        # CHANGE: Currently printing the investment opportunities. Email should be sent instead.
-        print ("Long straddle opportunities:")
-        for asset in long_straddle_opportunities:
-            print (f"{asset[0]}: {asset[1]}")
-            
-        print ("Short straddle opportunities:")
-        for asset in short_straddle_opportunities:
-            print (f"{asset[0]}: {asset[1]}")
-            
-        # TODO: implement logic for sending email (put email config to .env.secret)
+        self.notifier.notify(investment_data)
 
     def get_daily_pnls(self):
         """Returns daily pnls"""
@@ -98,13 +82,26 @@ class MarketWatcherEngine:
         yahoo_financials_target_stocks = YahooFinancials(target_stocks)
         return yahoo_financials_target_stocks.get_current_percent_change()
 
-    def is_investment_opportunity(self, strategy, daily_pnl):
+    def get_investment_data(self, investment_opportunities):
+        """Returns two dictionaries that contain investment data for both strategies"""
+        long_straddle = {}
+        short_straddle = {}
+
+        for ticker in investment_opportunities:
+            if STRATEGIES.LONG_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                long_straddle[ticker] = self.daily_pnls[ticker]
+            elif STRATEGIES.SHORT_STRADDLE.value == self.target_stocks[ticker]["strategy"]:
+                short_straddle[ticker] = self.daily_pnls[ticker]
+
+        return {STRATEGIES.LONG_STRADDLE.value:long_straddle, STRATEGIES.SHORT_STRADDLE.value:short_straddle}
+
+    def is_investment_opportunity(self, strategy, abs_daily_pnl):
         """Check if the stock is applicable for one of the options trading strategies."""
         if STRATEGIES.LONG_STRADDLE.value == strategy:
-            if abs(daily_pnl) > self.long_threshlold:
+            if abs_daily_pnl > self.long_threshlold:
                 return True
         elif STRATEGIES.SHORT_STRADDLE.value == strategy:
-            if abs(daily_pnl) < self.short_threshlold:
+            if abs_daily_pnl < self.short_threshlold:
                 return True
 
         return False
