@@ -89,11 +89,11 @@ def start(stocks):
         notifiers = []
 
         if context.state["email"]:
-            echo("Instantiating email notifier.")
+            echo("Instantiating email notifier...")
             notifiers.append(EmailNotifier(get_email_config()))
 
         if context.state["slack"]:
-            echo("Instantiating slack notifier.")
+            echo("Instantiating slack notifier...")
             notifiers.append(SlackNotifier(get_slack_config()))
 
         echo("Instantiating MarketWatcher and running the engine.")

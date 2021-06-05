@@ -1,7 +1,7 @@
 version: "3.8"
 services:
-  ibkr:
+  mw:
     build: .
-    image: ibkr
+    image: mw
     stdin_open: true
     tty: true
