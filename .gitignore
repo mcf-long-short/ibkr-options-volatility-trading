@@ -23,3 +23,6 @@ log.*
 
 # PyCharm files
 .idea
+
+# Pytest
+.pytest_cache

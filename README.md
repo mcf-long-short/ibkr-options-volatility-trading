@@ -1,5 +1,7 @@
 # Interactive Brokers: Volatility trading with options
 
+[![MarketWatcher Python package](https://github.com/mcf-long-short/ibkr-options-volatility-trading/actions/workflows/python-package.yaml/badge.svg)](https://github.com/mcf-long-short/ibkr-options-volatility-trading/actions/workflows/python-package.yaml)
+
 ## Introduction
 
 `Volatility trading` using `equity options` and `long/short straddle` option strategies combined with a `momentum strategy` to profit from a high/low volatility on a daily level in the US equities.

@@ -1,0 +1,35 @@
+name: MarketWatcher Python package
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 pytest wheel
+          # install requirements
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # install IBKR python api client
+          cd src/market_watcher/ib_client && python setup.py bdist_wheel && cd ../../..
+          python -m pip install src/market_watcher/ib_client/dist/ibapi-9.76.1-py3-none-any.whl
+          # Installing market_watcher_cli tool 
+          python -m pip install --editable src/.
+      - name: Lint with flake8
+        run: |
+          flake8 src tests
+      - name: Test with pytest
+        run: |
+          pytest
