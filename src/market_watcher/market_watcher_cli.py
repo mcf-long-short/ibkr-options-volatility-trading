@@ -23,7 +23,7 @@ def cli():
                                                                                                              
         MarketWatcher tool for finding investiments opportunities on Interacive Brokers
         for volatility trading on equity market using long and short options strategy.
-    """
+    """  # noqa
     )
     echo(f"version: v{VERSION}")
     echo("\n\n\n")
@@ -77,11 +77,11 @@ def config(notifier):
 )
 def start(stocks):
     """Starts the MarketWatcher."""
-    echo(f"Starting MarketWatcher...")
+    echo("Starting MarketWatcher...")
 
     try:
         context.running = True
-        echo(f"MarketWatcher started.")
+        echo("MarketWatcher started.")
 
         echo(f"Reading target stocks from file: {stocks}")
         target_stocks = get_terget_stocks(stocks)
@@ -108,10 +108,10 @@ def start(stocks):
 @cli.command()
 def stop():
     """Stops the MarketWatcher."""
-    echo(f"Stopping MarketWatcher...")
+    echo("Stopping MarketWatcher...")
 
     try:
         context.running = False
-        echo(f"MarketWatcher stopped.")
+        echo("MarketWatcher stopped.")
     except ValueError as e:
         echo(e)
