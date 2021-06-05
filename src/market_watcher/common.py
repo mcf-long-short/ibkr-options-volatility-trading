@@ -24,6 +24,7 @@ def get_terget_stocks(file_path):
 
 
 def get_email_config():
+    """Returns email notifier related configuration."""
     email_config = {}
     email_config["hostname"] = context.config["SMTP_HOSTNAME"]
     email_config["port"] = context.config["SMTP_PORT"]
@@ -32,6 +33,14 @@ def get_email_config():
     email_config["sender"] = context.config["EMAIL_SENDER"]
     email_config["recipients"] = context.config["EMAIL_RECIPIENTS"]
     return email_config
+
+
+def get_pnl_threashold_config():
+    """Returns strategy alert configuration."""
+    pnl_threashold = {}
+    pnl_threashold["LONG_THRESHOLD"] = float(context.config["LONG_THRESHOLD"])
+    pnl_threashold["SHORT_THRESHOLD"] = float(context.config["SHORT_THRESHOLD"])
+    return pnl_threashold
 
 
 def get_slack_config():
@@ -48,8 +57,9 @@ class MarketWatcherEngine:
         self.target_stocks = target_stocks
         self.notifiers = notifiers
 
-        self.long_threshlold = float(context.config["LONG_THRESHOLD"])
-        self.short_threshlold = float(context.config["SHORT_THRESHOLD"])
+        pnl_threashold_config = get_pnl_threashold_config()
+        self.long_threshlold = pnl_threashold_config["LONG_THRESHOLD"]
+        self.short_threshlold = pnl_threashold_config["SHORT_THRESHOLD"]
 
         self.daily_pnls = None
 
@@ -89,10 +99,13 @@ class MarketWatcherEngine:
 
         self.notify(investment_data)
 
+        return investment_data
+
     def notify(self, investment_data):
         """Sends investment updates to subscribed notifiers."""
-        for notifier in self.notifiers:
-            notifier.notify(investment_data)
+        if self.notifiers:
+            for notifier in self.notifiers:
+                notifier.notify(investment_data)
 
     def get_daily_pnls(self):
         """Returns daily pnls"""
