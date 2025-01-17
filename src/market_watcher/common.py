@@ -71,7 +71,6 @@ class MarketWatcherEngine:
         remaining_seconds = update_timeout
 
         while context.running:
-
             if remaining_seconds > 0:
                 remaining_seconds -= 1
                 time.sleep(1)
@@ -90,6 +89,9 @@ class MarketWatcherEngine:
         self.daily_pnls = self.get_daily_pnls()
         investment_opportunities = []
         for ticker in self.target_stocks:
+            if not self.daily_pnls[ticker]:
+                continue
+
             if self.is_investment_opportunity(
                 self.target_stocks[ticker]["strategy"], abs(self.daily_pnls[ticker])
             ):
