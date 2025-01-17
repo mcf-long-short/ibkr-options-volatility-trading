@@ -99,15 +99,18 @@ class SlackNotifier(Notifier):
         self.__short_url = config["short url"]
 
     def notify(self, investment_data):
-        long_straddle_message = self._long_straddle_message(
-            investment_data[STRATEGIES.LONG_STRADDLE.value]
-        )
-        short_straddle_message = self._short_straddle_message(
-            investment_data[STRATEGIES.SHORT_STRADDLE.value]
-        )
+        if investment_data[STRATEGIES.LONG_STRADDLE.value]:
+            long_straddle_message = self._long_straddle_message(
+                investment_data[STRATEGIES.LONG_STRADDLE.value]
+            )
+            self.send_message(self.__long_url, long_straddle_message)
 
-        self.send_message(self.__long_url, long_straddle_message)
-        self.send_message(self.__short_url, short_straddle_message)
+
+        if investment_data[STRATEGIES.SHORT_STRADDLE.value]:
+            short_straddle_message = self._short_straddle_message(
+                investment_data[STRATEGIES.SHORT_STRADDLE.value]
+            )
+            self.send_message(self.__short_url, short_straddle_message)
 
     def send_message(self, url, text):
         """Sends message to Slack channel using webhook."""
