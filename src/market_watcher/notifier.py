@@ -105,7 +105,6 @@ class SlackNotifier(Notifier):
             )
             self.send_message(self.__long_url, long_straddle_message)
 
-
         if investment_data[STRATEGIES.SHORT_STRADDLE.value]:
             short_straddle_message = self._short_straddle_message(
                 investment_data[STRATEGIES.SHORT_STRADDLE.value]
